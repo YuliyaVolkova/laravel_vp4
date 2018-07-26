@@ -1,0 +1,13 @@
+.form-w100 {
+    flex: 1;
+    max-width: 100%;
+}
+
+.textarea-row {
+    flex: 1;
+    max-width: 100%;
+}
+
+.textarea {
+    height: 8rem;
+}
