@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\DataClear\InputTrait;
 use App\Product;
-use App\Cat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Validator;
