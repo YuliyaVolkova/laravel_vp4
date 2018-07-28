@@ -4,6 +4,9 @@
         <div class="row justify-content-center">
             <div class="form-w100">
                 <div class="card">
+                    @if($product === null)
+                        <div class="card-header">Товар не найден</div>
+                    @else
                     <div class="card-header">Редактировать товар {{$product->id }}</div>
                     @if($cats->isNotEmpty())
                         <div class="card-body">
@@ -111,6 +114,7 @@
                             <a href="{{route('cat.create')}}" class="btn btn-success ml-3">Создать категорию</a>
                         </div>
                     @endif
+                @endif
                 </div>
             </div>
         </div>

@@ -14,9 +14,4 @@ class Cat extends Model
     {
         return $this->hasMany(Product::class, 'cat_id', 'id');
     }
-
-    public static function storeCat($array)
-    {
-        return self::create($array);
-    }
 }

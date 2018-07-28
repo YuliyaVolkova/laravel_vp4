@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Cat;
-use App\Http\Controllers\DataClear\InputTrait;
-use App\Http\Controllers\DataClear\ImageTrait;
 use App\Product;
+use App\Services\ClearData;
+use App\Services\ImageToUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Validator;
 
 class ProductController extends Controller
 {
-    use InputTrait, ImageTrait;
+    protected $data;
 
     protected function validation()
     {
-        return Validator::make($this->clearAll($this->data), [
+        return Validator::make($this->data, [
             'name' => 'required|max:255',
             'cat_id' => 'required|exists:cats,id',
             'description' => 'required|max:500',
@@ -40,13 +40,13 @@ class ProductController extends Controller
         return view('admin.product.create', ['cats' => Cat::all()]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, ClearData $clearData, ImageToUpload $image)
     {
         $this->data = $request->except(['image']);
-        $this->data['image_url'] = null;
-        $this->checkImage($request);
+        $this->data = $clearData->clearAll($this->data);
+        $this->data['image_url'] = $image->checkImage($request);
         $this->validation();
-        Product::storeProduct($this->data);
+        Product::create($this->data);
 
         return redirect()->route('admin.index');
     }
@@ -54,9 +54,6 @@ class ProductController extends Controller
     public function edit($productId)
     {
         $product = Product::find($productId);
-        if ($product === null) {
-            return redirect()->back();
-        }
         $data = [
             'cats' => Cat::all(),
             'product' => $product
@@ -65,15 +62,20 @@ class ProductController extends Controller
         return view('admin.product.edit', $data);
     }
 
-    public function update($productId, Request $request)
+    public function update($productId, Request $request, ClearData $clearData, ImageToUpload $image)
     {
         $this->data = $request->except(['image']);
+        $this->data = $clearData->clearAll($this->data);
         $product = Product::find($productId);
         if ($product === null) {
-            return redirect()->route('admin.index');
+            return redirect()->route('product.edit', ['product_id' => $productId]);
         }
         $this->data['image_url'] = $product->image_url;
-        $this->checkImage($request);
+        $newImageUrl = $image->checkImage($request);
+        if ($newImageUrl !== null) {
+            $this->data['image_url'] = $newImageUrl;
+        }
+
         $this->validation();
         $product->update($this->data);
 

@@ -1,6 +1,11 @@
 @extends('layouts.shop')
 @section('title')
-    Игры в разделе {{$catTitle}}
+    Игры в разделе
+    @if($catTitle !== null)
+        {{$catTitle}}
+    @else
+        'Категория не найдена'
+    @endif
 @endsection
 @section('content')
     <div class="content-main__container">

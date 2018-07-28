@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\DataClear\InputTrait;
+use App\Services\ClearData;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Auth;
@@ -15,8 +15,6 @@ use App\Events\OrderMailEvent;
 
 class OrderController extends Controller
 {
-    use InputTrait;
-
     public function show()
     {
         $userId = Auth::id();
@@ -42,11 +40,11 @@ class OrderController extends Controller
         ];
     }
 
-    public function store($productId, Request $request)
+    public function store($productId, Request $request, ClearData $clearData)
     {
         $userId = Auth::id();
 
-        $data = $this->clearAll($request->all());
+        $data = $clearData->clearAll($request->all());
         Validator::make($data, [
             'name' => 'required|string|max:255',
             'email' => ['required',

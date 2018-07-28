@@ -5,6 +5,7 @@
         <div class="row justify-content-center">
             <div class="form-w100">
                 <div class="card">
+                    @if($cat !== null)
                     <div class="card-header">Редактирование категории   {{$cat->title }}</div>
 
                     <div class="card-body">
@@ -51,6 +52,9 @@
                             </div>
                         </form>
                     </div>
+                    @else
+                        <div class="card-header">Категория не найдена</div>
+                    @endif
                 </div>
             </div>
         </div>

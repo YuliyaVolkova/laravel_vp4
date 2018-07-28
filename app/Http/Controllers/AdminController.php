@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Cat;
-use App\Http\Controllers\DataClear\InputTrait;
 use App\Product;
 use App\Order;
+use App\Services\ClearData;
 use App\User;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Http\Request;
@@ -13,8 +13,6 @@ use Validator;
 
 class AdminController extends Controller
 {
-    use InputTrait;
-
     public function index()
     {
         $data = [
@@ -30,9 +28,9 @@ class AdminController extends Controller
         return view('admin.index', $data);
     }
 
-    public function select(Request $request)
+    public function select(Request $request, ClearData $clearData)
     {
-        $data = $this->clearAll($request->all());
+        $data = $clearData->clearAll($request->all());
 
         Validator::make($data, [
             'name' => 'required|string|max:255',

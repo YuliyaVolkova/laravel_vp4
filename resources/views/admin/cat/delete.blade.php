@@ -9,8 +9,11 @@
                         <a href="{{route('admin.index')}}" class="btn btn-primary">Вернуться назад</a>
                         <a href="{{route('cat.edit', $cat->id)}}" class="btn btn-default">Редактировать</a>
                     </div>
+                    @if($cat !== null)
                     <div class="card-header">Удаление категории  {{ $cat->title }}</div>
-
+                    @if(!empty($product))
+                         невозможно, категория не пуста, удалите сначала товар ({{$product->name}})
+                    @endif
                     <div class="card-body">
                         <form method="POST" action="{{ route('cat.destroy', $cat->id) }}" aria-label="{{ __('Delete') }}">
                             @csrf
@@ -30,6 +33,9 @@
                             </div>
                         </form>
                     </div>
+                    @else
+                        <div class="card-header">Категория не найдена</div>
+                    @endif
                 </div>
             </div>
         </div>

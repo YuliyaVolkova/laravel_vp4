@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\DataClear;
+namespace App\Services;
 
-trait InputTrait
+class ClearData
 {
     protected function clear($field)
     {
@@ -12,7 +12,7 @@ trait InputTrait
         return $field;
     }
 
-    protected function clearAll($dataArray)
+    public function clearAll($dataArray)
     {
         return array_map(array($this, 'clear'), $dataArray);
     }

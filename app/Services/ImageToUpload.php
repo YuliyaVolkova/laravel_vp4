@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\DataClear;
+namespace App\Services;
 
 use Intervention\Image\ImageManagerStatic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-trait imageTrait
+class ImageToUpload
 {
-    protected $data;
-
-    protected function checkImage(Request $request)
+    public function checkImage(Request $request)
     {
         if (!$request->hasFile('image')) {
             return null;
@@ -20,17 +18,17 @@ trait imageTrait
             return null;
         }
         // сохраняем изображение в storage/app/public/image
-        $this->data['image_url'] = $request->file('image')->store('public/images');
+        $imageUrl = $request->file('image')->store('public/images');
 
         // путь к изображению для resize imageIntervention
-        $imgUrl = PUBLIC_PATH . DIRECTORY_SEPARATOR . '../storage/app/' . $this->data['image_url'];
+        $imgUrl = PUBLIC_PATH . DIRECTORY_SEPARATOR . '../storage/app/' . $imageUrl;
 
         if (!$this->uploadedImageHandler($imgUrl)) {
-            Storage::delete($this->data['image_url']);
-            return $this->data['image_url'] = null;
+            Storage::delete($imageUrl);
+            return null;
         }
 
-        return $this->data['image_url'] = str_replace('public', 'storage', $this->data['image_url']);
+        return str_replace('public', 'storage', $imageUrl);
     }
 
     protected function uploadedImageHandler($filePath)

@@ -20,11 +20,6 @@ class Product extends Model
         return $this->hasMany(Order::class, 'product_id', 'id');
     }
 
-    public static function storeProduct($array)
-    {
-        return self::create($array);
-    }
-
     public static function getProductsByCatId($catId)
     {
         return self::with('cat')
