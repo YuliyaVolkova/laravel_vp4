@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Config;
 
 class LoginController extends Controller
 {
@@ -29,7 +30,8 @@ class LoginController extends Controller
     //protected $redirectTo = '/home';
     protected function redirectTo()
     {
-        if (Auth::id() && Auth::user()->role === 1) {
+        if (Auth::id() && (Auth::user()->role === Config::get('constants.ADMIN_ROLE')
+            || Auth::user()->role === Config::get('constants.ADMIN_ROLE_FOR_SENDING_MAIL'))) {
             return '/admin';
     }
         return '/';

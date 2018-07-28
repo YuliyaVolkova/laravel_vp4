@@ -22,27 +22,36 @@ class Product extends Model
 
     public static function storeProduct($array)
     {
-        $product = new Product();
-        $product->name = $array['name'];
-        $product->cat_id = $array['cat_id'];
-        $product->image_url = $array['image_url'];
-        $product->description = $array['description'];
-        $product->price_rub = $array['price_rub'];
-        $product->quantity = $array['quantity'];
-        return $product->save();
+        return self::create($array);
     }
 
     public static function getProductsByCatId($catId)
     {
-        return Product::with('cat')
+        return self::with('cat')
             ->where('cat_id', $catId)
-            ->orderBy('created_at', 'desc')
-            ->paginate(6);
+            ->orderBy('id', 'desc');
     }
 
     public static function getProductById($productId)
     {
-        return Product::with('cat')
-            ->where('id', $productId)->first();
+        return self::with('cat')->find($productId);
+    }
+
+    public static function getNewProducts($number)
+    {
+        return self::orderBy('id', 'desc')
+            ->take($number)->get();
+    }
+
+    public static function searchByString($string)
+    {
+        return self::where('name', 'like', '%' . $string .'%')
+        ->orWhere('description', 'like', '%' . $string . '%')
+        ->orderBy('id', 'desc');
+    }
+
+    public static function randomProduct()
+    {
+        return self::inRandomOrder()->first();
     }
 }

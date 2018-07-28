@@ -6,10 +6,12 @@ function init(){
             type: 'get',
             url: $(this).attr('href'),
         }).done(function (data) {
-
-            $('form#storeOrder input[name="email"]').val(data.email);
-
+            if (!data) {
+                console.log('не получено данных');
+                return window.location = '/';
+            }
             const form = $('form#storeOrder');
+            $('form#storeOrder input[name="email"]').val(data.email);
             $(form).attr('action', `/order/store/${data.product}`);
 
             $(form).submit(function (e) {
@@ -22,14 +24,17 @@ function init(){
                     type: method,
                     url: action,
                     data: data
-                }).done(function() {
-                   return window.location.pathname = '/orders/show';
+                }).done(function(data) {
+                    if (!data) {
+                        return window.location = '/login';
+                    }
+                   return window.location = '/orders/show';
                 }).fail(function() {
-                    return window.location.pathname = '/login';
+                    console.log('Error network, повторите запрос');
                 });
             });
         }).fail(function() {
-            return window.location.pathname = '/login';
+            return window.location = '/login';
         });
     });
 }

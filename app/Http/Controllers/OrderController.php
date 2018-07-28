@@ -6,9 +6,9 @@ use App\Http\Controllers\DataClear\InputTrait;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Auth;
-use App\Cat;
 use App\Order;
 use App\Product;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Validation\Rule;
 use Validator;
 use App\Events\OrderMailEvent;
@@ -20,16 +20,9 @@ class OrderController extends Controller
     public function show()
     {
         $userId = Auth::id();
-        if (!$userId) {
-            return redirect()->route('login');
-        }
         $data = [
-            'productRandom' => Product::inRandomOrder()->first(),
-            'cats' => Cat::all(),
-            'orders' => Order::with('product')
-                ->where('user_id', $userId)
-                ->orderBy('created_at', 'desc')
-                ->paginate(4)
+            'orders' => Order::showOrders($userId)
+                ->paginate(Config::get('constants.ORDERS_PER_PAGE'))
         ];
         return view('single.userOrders', $data);
     }
@@ -37,23 +30,23 @@ class OrderController extends Controller
     public function create($productId)
     {
         $userId = Auth::id();
-        if (!$userId) {
-            return redirect()->route('login');
+
+        $product = Product::find($productId);
+        if ($product === null) {
+            return false;
         }
-        return ['email' => User::findOrFail($userId)->email,
-            'product' => Product::findOrFail($productId)->id
+
+        //response на ajax запрос
+        return ['email' => User::find($userId)->email,
+            'product' => $product->id
         ];
     }
 
     public function store($productId, Request $request)
     {
         $userId = Auth::id();
-        if (!$userId) {
-            return redirect()->route('login');
-        }
 
         $data = $this->clearAll($request->all());
-
         Validator::make($data, [
             'name' => 'required|string|max:255',
             'email' => ['required',
@@ -64,19 +57,25 @@ class OrderController extends Controller
             'message' => 'max:300'
         ])->validate();
 
-        User::findOrFail($userId)
-            ->update(['name' => $data['name'],
-                    'email' => $data['email']]);
+        $user = User::updateInfo($userId, ['name' => $data['name'],
+                    'email' => $data['email']
+            ]);
+
+        if ($user === null) {
+            return false;
+        }
 
         $order = Order::storeOrder($userId, $productId);
-        $order = Order::with('user', 'product')
-                    ->where('id', $order->id)
-                    ->first();
+
+        if ($order === null) {
+            return false;
+        }
+
+        $order = Order::with('user', 'product')->find($order->id);
 
         event(new OrderMailEvent((['order' => $order,
                                     'mes' => $data['message']
         ])));
-
-        return redirect()->route('orders.show');
+        return 'ok';
     }
 }

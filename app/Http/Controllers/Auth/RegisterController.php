@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -32,7 +33,8 @@ class RegisterController extends Controller
     //protected $redirectTo = '/home';
     protected function redirectTo()
     {
-        if (Auth::id() && Auth::user()->role === 1) {
+        if (Auth::id() && (Auth::user()->role === Config::get('constants.ADMIN_ROLE')
+                || Auth::user()->role === Config::get('constants.ADMIN_ROLE_FOR_SENDING_MAIL'))) {
             return '/admin';
         }
         return '/';
@@ -59,7 +61,7 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:' . Config::get('constants.MIN_LENGTH_PASSWORD') . '|confirmed',
         ]);
     }
 
@@ -75,7 +77,9 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => (array_key_exists('role', $data) && $data['role'] === 'on') ? 1 : 0
+            'role' => (array_key_exists('role', $data) && $data['role'] === 'on')
+                ? Config::get('constants.ADMIN_ROLE')
+                : Config::get('constants.CUSTOMER_ROLE')
         ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\DataClear\InputTrait;
 use App\Http\Controllers\DataClear\ImageTrait;
 use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Validator;
 
 class ProductController extends Controller
@@ -26,12 +27,10 @@ class ProductController extends Controller
 
     public function show($productId)
     {
+        $newProducts = Product::getNewProducts(Config::get('constants.PRODUCTS_PER_SINGLE_PAGE_BOTTOM'));
         $data = [
-            'productRandom' => Product::inRandomOrder()->first(),
-            'cats' => Cat::all(),
             'product' => Product::getProductById($productId),
-            'products' => Product::orderBy('created_at', 'desc')
-            ->take(3)->get()
+            'products' => $newProducts
         ];
         return view('single.product', $data);
     }
@@ -54,9 +53,13 @@ class ProductController extends Controller
 
     public function edit($productId)
     {
+        $product = Product::find($productId);
+        if ($product === null) {
+            return redirect()->back();
+        }
         $data = [
             'cats' => Cat::all(),
-            'product' => Product::findOrFail($productId)
+            'product' => $product
         ];
 
         return view('admin.product.edit', $data);
@@ -65,17 +68,22 @@ class ProductController extends Controller
     public function update($productId, Request $request)
     {
         $this->data = $request->except(['image']);
-        $this->data['image_url'] = Product::findOrFail($productId)->image_url;
+        $product = Product::find($productId);
+        if ($product === null) {
+            return redirect()->route('admin.index');
+        }
+        $this->data['image_url'] = $product->image_url;
         $this->checkImage($request);
         $this->validation();
-        Product::findOrFail($productId)->update($this->data);
+        $product->update($this->data);
 
         return redirect()->route('admin.index');
     }
 
     public function delete($productId)
     {
-        return view('admin.product.delete', ['product' => Product::with('cat')->findOrFail($productId)]);
+        $product = Product::getProductById($productId);
+        return view('admin.product.delete', ['product' => $product]);
     }
 
     public function destroy($productId)

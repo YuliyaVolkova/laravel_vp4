@@ -6,6 +6,7 @@ use App\Http\Controllers\DataClear\InputTrait;
 use App\Product;
 use App\Cat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Validator;
 
 class SearchController extends Controller
@@ -27,12 +28,8 @@ class SearchController extends Controller
         $this->validation();
         $searchStr = $this->data['q'];
         $result = [
-            'productRandom' => Product::inRandomOrder()->first(),
-            'cats' => Cat::all(),
-            'products' => Product::where('name', 'like', '%' . $searchStr .'%')
-            ->orWhere('description', 'like', '%' . $searchStr . '%')
-            ->orderBy('created_at', 'desc')
-            ->paginate(6)
+            'products' => Product::searchByString($searchStr)
+            ->paginate(Config::get('constants.PRODUCTS_PER_PAGE'))
         ];
         return view('shop', $result);
     }

@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Cat;
 use App\Product;
+use Illuminate\Support\Facades\Config;
 
 class ShopController extends Controller
 {
     public function index()
     {
         $data = [
-            'productRandom' => Product::inRandomOrder()->first(),
-            'cats' => Cat::all(),
-            'products' =>Product::orderBy('created_at', 'desc')
-            ->paginate(6)
+            'products' =>Product::orderBy('id', 'desc')
+            ->paginate(Config::get('constants.PRODUCTS_PER_PAGE'))
         ];
         return view('shop', $data);
     }

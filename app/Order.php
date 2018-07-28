@@ -22,13 +22,26 @@ class Order extends Model
 
     public static function storeOrder($userId, $productId)
     {
-        if (empty(Product::findOrFail($productId))) {
+        $user = User::find($userId);
+        if ($user === null) {
             return null;
         }
-        $order = new Order();
-        $order->user_id = $userId;
-        $order->product_id = $productId;
-        $order->save();
-        return $order;
+        $product = Product::find($productId);
+        if ($product === null) {
+            return null;
+        }
+        return self::create(
+            [
+                'user_id' => $userId,
+                'product_id' => $productId
+            ]
+        );
+    }
+
+    public static function showOrders($userId)
+    {
+        return self::with('product')
+            ->where('user_id', $userId)
+            ->orderBy('id', 'desc');
     }
 }

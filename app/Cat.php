@@ -15,11 +15,8 @@ class Cat extends Model
         return $this->hasMany(Product::class, 'cat_id', 'id');
     }
 
-    public static function storeCat($title, $description)
+    public static function storeCat($array)
     {
-        $cat = new Cat();
-        $cat->title = $title;
-        $cat->description = $description;
-        return $cat->save();
+        return self::create($array);
     }
 }

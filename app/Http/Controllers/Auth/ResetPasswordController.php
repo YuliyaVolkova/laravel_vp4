@@ -29,7 +29,8 @@ class ResetPasswordController extends Controller
     //protected $redirectTo = '/home';
     protected function redirectTo()
     {
-        if (Auth::id() && Auth::user()->role === 1) {
+        if (Auth::id() && (Auth::user()->role === Config::get('constants.ADMIN_ROLE')
+                || Auth::user()->role === Config::get('constants.ADMIN_ROLE_FOR_SENDING_MAIL'))) {
             return '/admin';
         }
         return '/';

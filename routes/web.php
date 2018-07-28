@@ -26,6 +26,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'AdminOnly']], function () {
     Route::get('/', 'AdminController@index')->name('admin.index');
+    Route::post('/inform/select', 'AdminController@select')->name('admin.select');
 
     Route::get('/cat/create', 'CatController@create')->name('cat.create');
     Route::post('/cat/store', 'CatController@store')->name('cat.store');

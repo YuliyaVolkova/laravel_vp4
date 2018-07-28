@@ -31,4 +31,13 @@ class User extends Authenticatable
     {
         $this->hasMany(Order::class, 'order_id', 'id');
     }
+
+    public static function updateInfo($id, $array)
+    {
+        $user = self::find($id);
+        if ($user === null) {
+            return null;
+        }
+        return $user->update($array);
+    }
 }

@@ -3,6 +3,51 @@
     <div class="tab-content ml-3">
         <div id="home" class="tab-pane fade">
             <h3>Admin-панель</h3>
+            <h4 class="mb-3">Вы можете выбрать администратора, на email которого отправлять заявки с сайта</h4>
+            <form method="POST" action="{{ route('admin.select') }}">
+                @csrf
+                <table class="table table-bordered">
+                    <tr>
+                        <td>Имя администратора</td>
+                        <td>Email</td>
+                        <td>Управление</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" name="name" value="{{(!Empty($admin))? $admin->name : ''}}">
+                            @if ($errors->has('name'))
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $errors->first('name') }}</strong>
+                                </span>
+                            @endif
+                        </td>
+                        <td>
+                            <select name = "userId">
+                                <option value="">&nbsp;</option>
+                                @if (!Empty($admin))
+                                    <option value="{{$admin->id}}" selected>
+                                        {{$admin->email}}
+                                    </option>
+                                @endif
+                                @if(!Empty($admins))
+                                    @foreach($admins as $user)
+                                        <option value="{{$user->id}}">
+                                            {{$user->email}}
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </td>
+                        <td>
+                            <div class="col-md-6 offset-md-4">
+                                <button type="submit" class="btn btn-primary">
+                                    {{ __('Сохранить в БД') }}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </form>
         </div>
         <div id="menu1" class="tab-pane fade active show">
 

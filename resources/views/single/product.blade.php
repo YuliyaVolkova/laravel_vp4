@@ -46,7 +46,7 @@
                         </div>
                         <div class="products-columns__item__thumbnail">
                             <a href="{{route('product.show', $product->id)}}" class="products-columns__item__thumbnail__link">
-                                <img src="{{$product->image_url}}" alt="Preview-image" class="products-columns__item__thumbnail__img">
+                                <img src="{{asset($product->image_url)}}" alt="Preview-image" class="products-columns__item__thumbnail__img">
                             </a>
                         </div>
                         <div class="products-columns__item__description">

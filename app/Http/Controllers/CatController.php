@@ -6,6 +6,7 @@ use App\Cat;
 use App\Http\Controllers\DataClear\InputTrait;
 use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Validator;
 use Illuminate\Validation\Rule;
 
@@ -15,11 +16,13 @@ class CatController extends Controller
 
     public function show($catId)
     {
-        $cat = Cat::findOrFail($catId);
+        $cat = Cat::find($catId);
+        if ($cat === null) {
+            return redirect()->back();
+        }
         $data = [
-            'productRandom' => Product::inRandomOrder()->first(),
-            'cats' => Cat::all(),
-            'products' => Product::getProductsByCatId($catId),
+            'products' => Product::getProductsByCatId($catId)
+            ->paginate(Config::get('constants.PRODUCTS_PER_PAGE')),
             'catTitle' => $cat->title
         ];
         return view('single.cat', $data);
@@ -39,18 +42,26 @@ class CatController extends Controller
             'description' => 'required|max:500',
         ])->validate();
 
-        Cat::storeCat($data['title'], $data['description']);
+        Cat::storeCat($data);
 
         return redirect()->route('admin.index');
     }
 
     public function edit($catId)
     {
-        return view('admin.cat.edit', ['cat' => Cat::findOrFail($catId)]);
+        $cat = Cat::find($catId);
+        if ($cat === null) {
+            return redirect()->back();
+        }
+        return view('admin.cat.edit', ['cat' => $cat]);
     }
 
     public function update($catId, Request $request)
     {
+        $cat = Cat::find($catId);
+        if ($cat === null) {
+            return redirect()->back();
+        }
         $data = $this->clearAll($request->all());
 
         Validator::make($data, [
@@ -62,19 +73,24 @@ class CatController extends Controller
         ])->validate();
 
 
-        Cat::findOrFail($catId)->update($data);
+        $cat->update($data);
 
         return redirect()->route('admin.index');
     }
 
     public function delete($catId)
     {
-        return view('admin.cat.delete', ['cat' => Cat::findOrFail($catId)]);
+        $cat = Cat::find($catId);
+        if ($cat === null) {
+            return redirect()->back();
+        }
+        return view('admin.cat.delete', ['cat' => $cat]);
     }
 
     public function destroy($catId)
     {
-        if (empty(Product::where('cat_id', $catId)->first())) {
+        $checkProducts = Product::getProductsByCatId($catId)->first();
+        if ($checkProducts === null) {
             Cat::destroy($catId);
         }
         return redirect()->route('admin.index');

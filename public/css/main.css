@@ -1120,3 +1120,8 @@ a img.aligncenter {
   width: 130%;
   background-color: #d0e26c;
   z-index: -5; }
+
+.cart-product__item__product-photo__image {
+  height: 100%;
+  width: auto;
+}

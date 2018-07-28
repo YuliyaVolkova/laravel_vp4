@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Cat;
+use App\Product;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +15,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        view()->composer('partials.catsList', function($view)
+        {
+            $view->with('cats', Cat::all());
+        });
+        view()->composer('partials.randomProduct', function ($view)
+        {
+            $view->with('productRandom', Product::randomProduct());
+        });
     }
 
     /**
